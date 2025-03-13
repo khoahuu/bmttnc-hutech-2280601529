@@ -1,7 +1,8 @@
-from cipher.caesar.alphabet import ALPHABET
+from cipher.caesar import ALPHABET
 class CaesarCipher:
     def __init__(self):
         self.alphabet = ALPHABET 
+
     def encrypt(self, text:str,key:int)->str:
        aplhabet_len = len(self.alphabet)
        text = text.upper()
@@ -12,6 +13,7 @@ class CaesarCipher:
            output_letter= self.alphabet[output_index]
            encrypted_text.append(output_letter)
        return "".join(encrypted_text)
+    
     def decrypt(self, text:str,key:int)->str:
         aplhabet_len = len(self.alphabet)
         text = text.upper()
