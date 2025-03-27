@@ -14,19 +14,19 @@ class MyApp(QMainWindow):
         self.ui.btn_sign.clicked.connect(self.call_api_sign)
         self.ui.btn_verify.clicked.connect(self.call_api_verify)
     def call_api_gen_keys(self):
-       url = "http://127.0.0.1:5000/api/rsa/genereate_keys"
-       try:
-           response = requests.get(url)
-           if response.status_code == 200:
-               data = response.json()
-               msg=QMessageBox()
-               msg.setIcon(QMessageBox.Information)
-               msg.setText(data['message'])
-               msg.exec_()
-           else:
-               print("Error while calling API")
-         except requests.exceptions.RequestException as e:
-             print("Error:%s"% e.message)
+        url="http://127.0.0.1:5000/api/rsa/generate_keys"
+        try:
+            response=requests.get(url)
+            if response.status_code==200:
+                data=response.json()
+                msg=QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText(data['message'])
+                msg.exec_()
+            else:
+                print("Error while calling API")
+        except requests.exceptions.RequestException as e:
+            print("Error:%s"% e.message)
     def call_api_encrypt(self):
         url = "http://127.0.0.1:5000/api/rsa/encrypt"
         payload = {
@@ -49,14 +49,14 @@ class MyApp(QMainWindow):
     def call_api_decrypt(self):
         url = "http://127.0.0.1:5000/api/rsa/decrypt"
         payload = {
-            "message": self.ui.txt_info.toPlainText(),
-            
-        }
+            "message": self.ui.txt_cipher_text.toPlainText(),
+            "key_type":"private"
+             }
         try:
             response = requests.post(url, json=payload)
             if response.status_code == 200:
                 data = response.json()
-                self.ui.txt_info.settext(data['decrypted_text'])
+                self.ui.txt_plain_text.settext(data['decrypted_message'])
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
                 msg.setText("Decryption Successfuly")
@@ -65,3 +65,51 @@ class MyApp(QMainWindow):
                 print("Error while calling API")
         except requests.exceptions.RequestException as e:
             print("Error:%s"% e.message)
+    def call_api_sign(self):
+        url="http://127.0.0.1:5000/api/rsa/sign"
+        payload={
+            "message":self.ui.txt_info.toPlainText()
+        }
+        try:
+            response=requests.post(url,json=payload)
+            if response.status_code==200:
+                data=response.json()
+                self.ui.txt_signature.settext(data['signature'])
+                msg=QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("Signature Successfuly")
+                msg.exec_()
+            else:
+                print("Error while calling API")
+        except requests.exceptions.RequestException as e:
+            print("Error:%s"% e.message)
+    def call_api_verify(self):
+        url="http://127.0.0.1:5000/api/rsa/verify"
+        payload={
+            "message":self.ui.txt_info.toPlainText(),
+            "signature":self.ui.txt_sign.toPlainText()
+        }
+        try:
+            response=requests.post(url,json=payload)
+            if response.status_code==200:
+                data=response.json()
+                if (data['verified']):
+                    msg=QMessageBox()
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("Verified Successfully")
+                    msg.exec_()
+                else:
+                    msg=QMessageBox()
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("Verification Failed")
+                    msg.exec_()
+            else:
+                print("Error while calling API")
+        except requests.exceptions.RequestException as e:
+            print("Error:%s"% e.message)
+if __name__ == "__main__":
+    app=QApplication(sys.argv)
+    window=MyApp()
+    window.show()
+    sys.exit(app.exec_())
+        
