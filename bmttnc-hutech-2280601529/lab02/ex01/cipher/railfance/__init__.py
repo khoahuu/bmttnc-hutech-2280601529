@@ -1,0 +1,1 @@
+from .railfance_cipher import RailFenceCipher
